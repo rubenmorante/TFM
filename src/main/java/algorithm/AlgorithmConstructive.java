@@ -1,6 +1,8 @@
 package algorithm;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.locks.ReentrantLock;
 
 import constructive.Constructive;
@@ -66,11 +68,13 @@ public class AlgorithmConstructive implements Algorithm {
 	
 	@Override
 	public Result execute(Instance instance) {//TODO
-
+		
+		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
 		long startTime = System.currentTimeMillis();
 		for(int x = 0; x < this.nTimesRepeat; ++x) {
-			new Thread(() -> this.executeThread(instance)).start();
+			executor.execute(() -> this.executeThread(instance));
 		}
+		executor.shutdown();
 
 		try {
 			this.countDownLatch.await();

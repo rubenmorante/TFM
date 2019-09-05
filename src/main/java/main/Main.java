@@ -8,7 +8,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import algorithm.AlgorithmConstructive;
 import constructive.Constructive;
 import constructive.GRASP;
-import constructive.Random;
 import improvement.Improvement;
 import improvement.Improvement1x1;
 import improvement.StrategicOscillation;
@@ -24,8 +23,8 @@ public class Main {
 	public static final String OUTPUT = "Results.csv";
 	
 	//Configuration of the algorithm
-	public static final Constructive CONSTRUCTIVE = new Random();
-	//public static final Constructive CONSTRUCTIVE = new GRASP();
+	//public static final Constructive CONSTRUCTIVE = new Random();
+	public static final Constructive CONSTRUCTIVE = new GRASP();
 	public static final Improvement IMPROVEMENT_1 = new Improvement1x1();
 	public static final Improvement IMPROVEMENT_2 = new StrategicOscillation();
 	public static final int N_TIMES = 100;
