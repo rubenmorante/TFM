@@ -11,41 +11,55 @@ public class Improvement1x1 implements Improvement {
 	
 	@Override
 	public void improve(Solution solution) {
-		boolean improve = true;
-		while(improve) {
+		boolean improve;
+		do {
 			improve = false;
 
 			int posFirstSolution = 0;
 			int posLastSolution = solution.size();
+			double oldQuality = solution.getQuality();
 			while (!improve && (posFirstSolution < posLastSolution)) {
-				Node nodeInSolution = solution.getNodeSolution(posFirstSolution);
-				
-				solution.removeNodeSolution(nodeInSolution);//remove node in solution
-				double oldQuality = solution.getQuality();
-				
-				
+				Node nodeInSolution = this.removeNodeFromSolution(solution, posFirstSolution);				
 				int posFirstNotInSolution = 0;
 				int posLastNotInSolution = solution.sizeNotInSolution();
 				while (!improve && (posFirstNotInSolution < posLastNotInSolution)) {
-					Node nodeNotInSolution = solution.getNodeNotInSolution(posFirstNotInSolution);
-					
-					solution.addNodeNotInSolution(nodeInSolution);//add node in notInSolution
-					solution.moveToSolution(nodeNotInSolution);//remove node in notInSolution and add node in solution
-										
-					improve = solution.updateQuality();
+					Node candidateNode = this.addCandidateNodeToSolution(solution, posFirstNotInSolution, nodeInSolution);					
+					improve = this.isBetterSolution(solution, oldQuality);
 					if(!improve) {
 						--posLastNotInSolution;
-						solution.moveToNotSolution(nodeNotInSolution);//remove node in solution and add node in notInSolution												
-						solution.removeNodeNotInSolution(nodeInSolution);//remove node in notInSolution
-						solution.setQuality(oldQuality);
+						this.removeCandidateNodeFromSolution(solution, candidateNode, oldQuality, nodeInSolution);						
 					}
 				}	
 				
 				if(!improve) {
 					--posLastSolution;
-					solution.addNodeSolution(nodeInSolution);//add node in solution
+					solution.addNodeSolution(nodeInSolution);
 				}
 			}//while
-		}//while
-	}//improve
-}//class
+		} while(improve);
+	}
+	
+	private Node removeNodeFromSolution(Solution solution, int posFirstSolution) {
+		Node nodeInSolution = solution.getNodeSolution(posFirstSolution);		
+		solution.removeNodeSolution(nodeInSolution);
+		return nodeInSolution;
+	}
+	
+	private Node addCandidateNodeToSolution(Solution solution, int posFirstNotInSolution, Node nodeInSolution) {
+		Node nodeNotInSolution = solution.getNodeNotInSolution(posFirstNotInSolution);
+		solution.addNodeNotInSolution(nodeInSolution);
+		solution.moveToSolution(nodeNotInSolution);
+		solution.updateQuality();
+		return nodeNotInSolution;
+	}
+	
+	private void removeCandidateNodeFromSolution(Solution solution, Node node, double oldQuality, Node nodeInSolution) {
+		solution.moveToNotSolution(node);
+		solution.removeNodeNotInSolution(nodeInSolution);
+		solution.setQuality(oldQuality);
+	}
+	
+	private boolean isBetterSolution(Solution solution, double oldQuality) {
+		return solution.isWorseSolution(oldQuality);
+	}	
+}

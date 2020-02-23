@@ -58,13 +58,6 @@ public class NodeTest {
 	}
 	
 	@Test
-	public void test1EuclideanDistance() {		
-		
-		double euclideanDistance1 =  Node.euclideanDistance(5f, 4f, 9f, 7f);
-		assertTrue(euclideanDistance1 == 5);
-	}
-	
-	@Test
 	public void test2EuclideanDistance() {
 		Node node1 = new Node(5f, 4f);
 		Node node2 = new Node(9f, 7f);
@@ -72,22 +65,4 @@ public class NodeTest {
 		double euclideanDistance2 =  Node.euclideanDistance(node1, node2);
 		assertTrue(euclideanDistance2 == 5);
 	}
-	
-	@Test
-	public void test3EuclideanDistance() {
-		Node node1 = new Node(5f, 4f);
-		
-		double euclideanDistance3 =  node1.euclideanDistance(9f, 7f);
-		assertTrue(euclideanDistance3 == 5);
-	}
-	
-	@Test
-	public void test4EuclideanDistance() {
-		Node node1 = new Node(5f, 4f);
-		Node node2 = new Node(9f, 7f);
-		
-		double euclideanDistance4 =  node1.euclideanDistance(node2);
-		assertTrue(euclideanDistance4 == 5);
-	}
-
 }

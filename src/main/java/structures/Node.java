@@ -28,21 +28,7 @@ public class Node {
 		return ((this.getX() == node.getX()) && (this.getY() == node.getY()));
 	}
 	
-	public static double euclideanDistance(float x1, float y1, float x2, float y2){
-		double result = Math.sqrt((Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2)));
-		return result;
-	}
-	
 	public static double euclideanDistance(Node node1, Node node2){
-		return euclideanDistance(node1.getX(), node1.getY(), node2.getX(), node2.getY());
+		return Math.sqrt((Math.pow((node2.getX() - node1.getX()), 2) + Math.pow((node2.getY() - node1.getY()), 2)));
 	}
-	
-	public double euclideanDistance(float x2, float y2){
-		double result = Math.sqrt((Math.pow((x2 - this.x), 2) + Math.pow((y2 - this.y), 2)));
-		return result;
-	}
-	
-	public double euclideanDistance(Node node){
-		return this.euclideanDistance(node.getX(), node.getY());
-	}	
 }

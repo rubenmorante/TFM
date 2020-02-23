@@ -34,29 +34,4 @@ public class Random implements Constructive {
 		
 		return new Solution(solutionList, notInSolutionList, instance);
 	}
-	
-	/*@Override
-	public Solution construct(Instance instance) {
-		
-		ArrayList<Node> nodeList = instance.getListNodes();
-
-		int p = instance.getP();
-		ArrayList<Node> solutionList = new ArrayList<Node>();
-		
-		for (int i = 0; i < p; ++i) {
-			boolean repeat = true;
-			while(repeat){
-				
-				int intRandom = RandomManager.nextInt(nodeList.size());				
-				Node node = nodeList.get(intRandom);
-				
-				if(!solutionList.contains(node)){
-					solutionList.add(node);
-					repeat = false;
-				}
-			}
-		}
-		
-		return new Solution(solutionList, instance);
-	}*/
 }

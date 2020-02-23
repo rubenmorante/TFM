@@ -14,65 +14,53 @@ import structures.Solution;
 public class AlgorithmConstructive implements Algorithm {
 	
 	private final Constructive constructive;
-	private final Improvement improvement_1;
-	private Improvement improvement_2;
 	private final int nTimesRepeat;
+	private Improvement improvement_1;
+	private Improvement improvement_2;
 	
 	//concurrent variable
-	private volatile Solution bestSolution = null;//TODO
-	private volatile double bestQuality = Double.MAX_VALUE;//TODO
-	private CountDownLatch countDownLatch;//TODO
-	private final ReentrantLock reentrantLock = new ReentrantLock();//TODO
+	private volatile Solution bestSolution = null;
+	private volatile double bestQuality = Double.MAX_VALUE;
+	private CountDownLatch countDownLatch;
+	private final ReentrantLock reentrantLock = new ReentrantLock();
 	
-	
-	public AlgorithmConstructive(Constructive constructive, Improvement improvement_1, int nTimesRepeat) {
+	public AlgorithmConstructive(Constructive constructive, int nTimesRepeat) {
 		super();
 		this.constructive = constructive;
-		this.improvement_1 = improvement_1;
 		this.nTimesRepeat = nTimesRepeat;
+		this.improvement_1 = null;
 		this.improvement_2 = null;
 		
-		this.countDownLatch = new CountDownLatch(this.nTimesRepeat);//TODO
+		this.countDownLatch = new CountDownLatch(this.nTimesRepeat);
+	}
+	
+	public AlgorithmConstructive(Constructive constructive, Improvement improvement_1, int nTimesRepeat) {
+		this(constructive, nTimesRepeat);
+		this.improvement_1 = improvement_1;
+		this.improvement_2 = null;
 	}
 	
 	public AlgorithmConstructive(Constructive constructive, Improvement improvement_1, Improvement improvement_2, int nTimesRepeat) {
 		this(constructive, improvement_1, nTimesRepeat);
 		this.improvement_2 = improvement_2;
-	}
-
-
-
-	//Part of the code that it works in a thread
-	public void executeThread(Instance instance) {//TODO
-		Solution candidateSolution = this.constructive.construct(instance);
-		//double firstQuality = candidateSolution.getQuality();//TODO
-		this.improvement_1.improve(candidateSolution);
-		
-		if(this.improvement_2 != null) {
-			this.improvement_2.improve(candidateSolution);
-		}
-		
-		double candidateQuality = candidateSolution.getQuality();
-		
-		this.reentrantLock.lock();		
-		if(this.getBestQuality() > candidateQuality) {
-			this.setBestQuality(candidateQuality);
-			this.setBestSolution(candidateSolution);
-		}
-		this.reentrantLock.unlock();
-		//System.out.println("First quality:\t" + firstQuality + "\tSecond quality:\t" + candidateQuality);//TODO
-		
-		this.countDownLatch.countDown();
-	}
-	
+	}	
 	
 	@Override
-	public Result execute(Instance instance) {//TODO
-		
+	public Result executeSequential(Instance instance) {
+		long startTime = System.currentTimeMillis();
+		for(int x = 0; x < this.nTimesRepeat; ++x) {
+			this.generateSolutionSequential(instance);
+		}	
+		long time = (System.currentTimeMillis() - startTime);
+		return  new Result(this.getBestSolution(), time);
+	}
+	
+	@Override
+	public Result executeParallel(Instance instance) {
 		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
 		long startTime = System.currentTimeMillis();
 		for(int x = 0; x < this.nTimesRepeat; ++x) {
-			executor.execute(() -> this.executeThread(instance));
+			executor.execute(() -> this.generateSolutionParallel(instance));
 		}
 		executor.shutdown();
 
@@ -87,54 +75,54 @@ public class AlgorithmConstructive implements Algorithm {
 		return new Result(this.getBestSolution(), time);
 	}
 
+	private void generateSolutionParallel(Instance instance) {		
+		Solution candidateSolution = this.generateSolution(instance);		
+		double candidateQuality = candidateSolution.getQuality();
+		
+		this.reentrantLock.lock();		
+		this.updateQualitySolution(candidateQuality, candidateSolution);
+		this.reentrantLock.unlock();		
+		
+		this.countDownLatch.countDown();
+	}
+	
+	private void generateSolutionSequential(Instance instance) {		
+		Solution candidateSolution = this.generateSolution(instance);		
+		double candidateQuality = candidateSolution.getQuality();
+		this.updateQualitySolution(candidateQuality, candidateSolution);
+	}
+	
+	private Solution generateSolution(Instance instance) {
+		Solution candidateSolution = this.constructive.construct(instance);
+		if(this.improvement_1 != null) {
+			this.improvement_1.improve(candidateSolution);
+		}		
+		if(this.improvement_2 != null) {
+			this.improvement_2.improve(candidateSolution);
+		}
+		return candidateSolution;
+	}
+	
+	private void updateQualitySolution(double candidateQuality, Solution candidateSolution) {
+		if(this.getBestQuality() > candidateQuality) {
+			this.setBestQuality(candidateQuality);
+			this.setBestSolution(candidateSolution);
+		}
+	}
 
-
-	private Solution getBestSolution() {//TODO
+	private Solution getBestSolution() {
 		return this.bestSolution;
 	}
 
-
-
-	private synchronized void setBestSolution(Solution bestSolution) {//TODO
+	private synchronized void setBestSolution(Solution bestSolution) {
 		this.bestSolution = bestSolution;
 	}
 
-
-
-	private double getBestQuality() {//TODO
+	private double getBestQuality() {
 		return this.bestQuality;
 	}
 
-
-
-	private synchronized void setBestQuality(double bestQuality) {//TODO
+	private synchronized void setBestQuality(double bestQuality) {
 		this.bestQuality = bestQuality;
-	}
-	
-	/*@Override
-	public Result execute(Instance instance) {
-		
-		Solution bestSolution = null;
-		double bestQuality = Double.MAX_VALUE;
-
-		long startTime = System.currentTimeMillis();
-		for(int x = 0; x < this.nTimesRepeat; ++x) {
-			Solution candidateSolution = this.constructive.construct(instance);
-			//double firstQuality = candidateSolution.getQuality();//TODO
-			this.improvement.improve(candidateSolution);
-			double candidateQuality = candidateSolution.getQuality();
-			
-			if(bestQuality > candidateQuality) {
-				bestQuality = candidateQuality;
-				bestSolution = candidateSolution;
-			}
-			
-			//System.out.println("First quality:\t" + firstQuality + "\tSecond quality:\t" + candidateQuality);//TODO
-		}
-		long time = (System.currentTimeMillis() - startTime);
-		
-		return new Result(bestSolution, time);
-	}*/
-	
-	
+	}		
 }
