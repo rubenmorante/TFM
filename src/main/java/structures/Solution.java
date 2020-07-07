@@ -37,22 +37,44 @@ public class Solution {
 	 * Update Solution
 	 * @return
 	 */
+//	public double updateQuality() {
+//		double[] closeDistance = {0, 0};		
+//		for(Node nodeSolution : this.listNode){
+//			for(Node node : this.notInSolution){
+//				double distance = this.instance.getEuclideanDistance(nodeSolution, node);
+//				if(closeDistance[0] < distance){
+//					closeDistance[1] = closeDistance[0];
+//					closeDistance[0] = distance;
+//				} else if(closeDistance[1] < distance){
+//					closeDistance[1] = distance;
+//				}
+//			}
+//		}
+//		this.setQuality(closeDistance[Solution.ALPHA - 1]);
+//		return this.getQuality();
+//	}
+	
 	public double updateQuality() {
-		double[] closeDistance = {0, 0};		
-		for(Node nodeSolution : this.listNode){
-			for(Node node : this.notInSolution){
-				double distance = this.instance.getEuclideanDistance(nodeSolution, node);
-				if(closeDistance[0] < distance){
+		double quality = 0;
+		for(Node nodeNotInsolution : this.notInSolution){
+			double[] closeDistance = {Double.MAX_VALUE, Double.MAX_VALUE};	
+			for(Node nodeSolution : this.listNode){
+				double distance = this.instance.getEuclideanDistance(nodeNotInsolution, nodeSolution);
+				if(closeDistance[0] > distance){
 					closeDistance[1] = closeDistance[0];
 					closeDistance[0] = distance;
-				} else if(closeDistance[1] < distance){
+				} else if(closeDistance[1] > distance){
 					closeDistance[1] = distance;
 				}
 			}
+			if(quality < closeDistance[Solution.ALPHA - 1]) {
+				quality = closeDistance[Solution.ALPHA - 1];
+			}
 		}
-		this.setQuality(closeDistance[Solution.ALPHA - 1]);
+		this.setQuality(quality);
 		return this.getQuality();
 	}
+	
 	
 	public Solution clone() {
 		List<Node> listNode = cloneListNode();

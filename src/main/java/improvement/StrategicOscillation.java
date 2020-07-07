@@ -23,6 +23,7 @@ public class StrategicOscillation implements Improvement{
 		int countOscilation = 0;
 		
 		while(countOscilation < 3) {
+//			long start = System.currentTimeMillis();
 			
 			int pImprove = (int) (p * (StrategicOscillation.DELTA + (StrategicOscillation.INCREASE_DELTA * countOscilation)));
 			if(!isItPossibleToOscillate(solution, pImprove)) {
@@ -33,7 +34,8 @@ public class StrategicOscillation implements Improvement{
 						
 			this.addNode(pImprove, solutionClone);
 			this.improvement.improve(solutionClone);
-						
+			solutionClone.updateQuality();
+			
 			this.removeNode(pImprove, solutionClone);
 			this.improvement.improve(solutionClone);
 			solutionClone.updateQuality();
@@ -47,7 +49,8 @@ public class StrategicOscillation implements Improvement{
 			
 			this.removeNode(pImprove, solutionClone);
 			this.improvement.improve(solutionClone);
-						
+			solutionClone.updateQuality();
+			
 			this.addNode(pImprove, solutionClone);
 			this.improvement.improve(solutionClone);
 			solutionClone.updateQuality();
@@ -58,7 +61,8 @@ public class StrategicOscillation implements Improvement{
 				solution.setSolution(solutionClone);
 			} else {
 				++countOscilation;
-			}			
+			}
+//			System.out.println("Construct solution: "  + (System.currentTimeMillis() - start));			
 		}		
 	}
 	
