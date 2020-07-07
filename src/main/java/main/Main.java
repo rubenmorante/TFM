@@ -27,7 +27,7 @@ public class Main {
 	public static final Improvement1x1 IMPROVEMENT_LS1x1 = new Improvement1x1();
 	public static final StrategicOscillation IMPROVEMENT_SO = new StrategicOscillation(IMPROVEMENT_LS1x1);
 	public static final int N_TIMES = 100;	
-	public static final Choise CHOISE = Choise.GRASP_PAR_LS_SO;
+	public static final Choise CHOISE = Choise.RANDOM_PAR;
 	
 	
 	public static Result menu(Instance instance) {
@@ -36,6 +36,8 @@ public class Main {
 		case GRASP_SEQ: 		return new AlgorithmConstructive(Main.CONSTRUCTIVE_GRASP,  Main.N_TIMES).executeSequential(instance);
 		case RANDOM_SEQ_LS:		return new AlgorithmConstructive(Main.CONSTRUCTIVE_RANDOM, Main.IMPROVEMENT_LS1x1, Main.N_TIMES).executeSequential(instance);
 		case GRASP_SEQ_LS: 		return new AlgorithmConstructive(Main.CONSTRUCTIVE_GRASP,  Main.IMPROVEMENT_LS1x1, Main.N_TIMES).executeSequential(instance);
+		case RANDOM_PAR: 		return new AlgorithmConstructive(Main.CONSTRUCTIVE_RANDOM, Main.N_TIMES).executeParallel(instance);
+		case GRASP_PAR: 		return new AlgorithmConstructive(Main.CONSTRUCTIVE_GRASP,  Main.N_TIMES).executeParallel(instance);
 		case RANDOM_PAR_LS:		return new AlgorithmConstructive(Main.CONSTRUCTIVE_RANDOM, Main.IMPROVEMENT_LS1x1, Main.N_TIMES).executeParallel(instance);
 		case GRASP_PAR_LS: 		return new AlgorithmConstructive(Main.CONSTRUCTIVE_GRASP,  Main.IMPROVEMENT_LS1x1, Main.N_TIMES).executeParallel(instance);
 		case GRASP_PAR_LS_SO: 	return new AlgorithmConstructive(Main.CONSTRUCTIVE_GRASP,  Main.IMPROVEMENT_LS1x1, Main.IMPROVEMENT_SO, Main.N_TIMES).executeParallel(instance);
@@ -45,8 +47,10 @@ public class Main {
 	}
 	
 	public static void main(String[] args) {
-//		String result = executeFolder();
-		String result = executeFile("eil101_101_30.txt");
+		String result = executeFolder();
+//		String result = executeFile("pr439_439_90.txt");
+//		String result = executeFile("att48_48_10.txt");
+//		String result = executeFile("att48_48_20.txt");
 
 		System.out.println(result);
 	}

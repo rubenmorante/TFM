@@ -55,6 +55,11 @@ public class AlgorithmConstructive implements Algorithm {
 		return  new Result(this.getBestSolution(), time);
 	}
 	
+	private void generateSolutionSequential(Instance instance) {		
+		Solution candidateSolution = this.generateSolution(instance);		
+		this.updateQualitySolution(candidateSolution);
+	}
+	
 	@Override
 	public Result executeParallel(Instance instance) {
 		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
@@ -63,47 +68,42 @@ public class AlgorithmConstructive implements Algorithm {
 			executor.execute(() -> this.generateSolutionParallel(instance));
 		}
 		executor.shutdown();
-
 		try {
 			this.countDownLatch.await();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		
 		long time = (System.currentTimeMillis() - startTime);
-		
 		return new Result(this.getBestSolution(), time);
 	}
 
 	private void generateSolutionParallel(Instance instance) {		
 		Solution candidateSolution = this.generateSolution(instance);		
-		double candidateQuality = candidateSolution.getQuality();
-		
 		this.reentrantLock.lock();		
-		this.updateQualitySolution(candidateQuality, candidateSolution);
-		this.reentrantLock.unlock();		
-		
+		this.updateQualitySolution(candidateSolution);
+		this.reentrantLock.unlock();			
 		this.countDownLatch.countDown();
 	}
 	
-	private void generateSolutionSequential(Instance instance) {		
-		Solution candidateSolution = this.generateSolution(instance);		
-		double candidateQuality = candidateSolution.getQuality();
-		this.updateQualitySolution(candidateQuality, candidateSolution);
-	}
-	
 	private Solution generateSolution(Instance instance) {
+//		long start = System.currentTimeMillis();
 		Solution candidateSolution = this.constructive.construct(instance);
+//		System.out.println("Construct solution: "  + (System.currentTimeMillis() - start));
 		if(this.improvement_1 != null) {
+//			start = System.currentTimeMillis();
 			this.improvement_1.improve(candidateSolution);
+//			System.out.println("Improvement_1 solution: "  + (System.currentTimeMillis() - start));
 		}		
 		if(this.improvement_2 != null) {
+//			start = System.currentTimeMillis();
 			this.improvement_2.improve(candidateSolution);
+//			System.out.println("Improvement_2 solution: "  + (System.currentTimeMillis() - start));
 		}
 		return candidateSolution;
 	}
 	
-	private void updateQualitySolution(double candidateQuality, Solution candidateSolution) {
+	private void updateQualitySolution(Solution candidateSolution) {
+		double candidateQuality = candidateSolution.getQuality();
 		if(this.getBestQuality() > candidateQuality) {
 			this.setBestQuality(candidateQuality);
 			this.setBestSolution(candidateSolution);

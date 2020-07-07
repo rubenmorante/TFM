@@ -13,7 +13,7 @@ import structures.Solution;
 
 public class GRASP implements Constructive {
 
-	public static final float BETA = 0.25f; // 0..1
+	public static final float BETA = 0.75f; // 0..1
 	
 	public GRASP() {
 		super();
@@ -21,7 +21,6 @@ public class GRASP implements Constructive {
 
 	@Override
 	public Solution construct(Instance instance) {
-
 		List<Node> CL = instance.getCloneListNodes();
 		List<Node> S = new ArrayList<Node>();
 		int P = instance.getP();
@@ -30,14 +29,11 @@ public class GRASP implements Constructive {
 		Node nodeV = CL.remove(v);
 		S.add(nodeV);
 		
-		while(S.size() < P) {
-			
+		while(S.size() < P) {			
 			Node nodeU = GRASP.takeFurthestNode(CL, S, instance);
-
 			S.add(nodeU);
 			CL.remove(nodeU);			
 		}		
-		
 		return new Solution(S, CL, instance);
 	}
 	
@@ -51,7 +47,6 @@ public class GRASP implements Constructive {
 	 */
 	public static Node takeFurthestNode(List<Node> CL, List<Node> S, Instance instance) {
 		List<NodeSpecial> auxiliarList = GRASP.createOrderDistanceList(CL, S, instance);
-		
 		double gMin = auxiliarList.get(0).getDistance();
 		double gMax = auxiliarList.get(auxiliarList.size()-1).getDistance();
 		double mu = gMax - GRASP.BETA * (gMax - gMin);
@@ -69,13 +64,11 @@ public class GRASP implements Constructive {
 	 */
 	private static List<Node> createRCL(double mu, List<NodeSpecial> auxiliarList) {
 		List<Node> RCL = new ArrayList<Node>(); 
-		
 		int numNode = auxiliarList.size() - 1;
 		while(numNode >= 0 && auxiliarList.get(numNode).getDistance() >= mu) {			
 			RCL.add(auxiliarList.get(numNode).getNode());
 			--numNode;
 		}
-		
 		return RCL;
 	}
 	
